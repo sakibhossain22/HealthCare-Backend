@@ -12,21 +12,21 @@ enum UserStatus {
 }
 
 model User {
-  id                  String     @id
-  name                String
-  email               String
-  emailVerified       Boolean    @default(false)
-  image               String?
-  role                UserRole   @default(PATIENT)
-  status              UserStatus @default(ACTIVE)
+  id                 String     @id
+  name               String
+  email              String
+  emailVerified      Boolean    @default(false)
+  image              String?
+  role               UserRole   @default(PATIENT)
+  status             UserStatus @default(ACTIVE)
   needPasswordChange Boolean    @default(false)
-  isDeleted           Boolean    @default(false)
-  DeletedAt           DateTime?
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
-  sessions            Session[]
-  accounts            Account[]
-
+  isDeleted          Boolean    @default(false)
+  DeletedAt          DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  sessions           Session[]
+  accounts           Account[]
+  patient            Patient?
   @@unique([email])
   @@map("user")
 }

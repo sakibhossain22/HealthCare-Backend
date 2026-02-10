@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { UserRole, UserStatus } from "../../generated/prisma/enums";
+import { envConfig } from "../../config/env";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -34,7 +35,7 @@ export const auth = betterAuth({
             }
         },
     },
-    trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:3000"],
+    trustedOrigins: [envConfig.BETTER_AUTH_URL || "http://localhost:5000"],
     advanced: {
         disableCSRFCheck: true,
     }
