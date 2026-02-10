@@ -3,4 +3,4 @@ dist
 .env
 dist
 
-/generated/prisma
+/src/app/generated/
