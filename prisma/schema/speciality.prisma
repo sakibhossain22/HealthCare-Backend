@@ -1,14 +1,30 @@
 model Speciality {
-    id          String    @id @default(uuid()) @db.Uuid
-    title       String    @unique @db.VarChar(255)
-    description String?   @db.Text
-    icon        String?   @db.VarChar(255)
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
-    isDeleted   Boolean   @default(false)
-    DeletedAt   DateTime?
+  id          String             @id @default(uuid())
+  title       String             @unique @db.VarChar(255)
+  description String?            @db.Text
+  icon        String?            @db.VarChar(255)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  isDeleted   Boolean            @default(false)
+  deletedAt   DateTime?          
+  doctors     DoctorSpeciality[]
 
-    @@index([title], name: "idx_speciality_title")
-    @@index([isDeleted], name: "idx_speciality_isDeleted")
-    @@map("specialities")
+  @@index([title], name: "idx_speciality_title")
+  @@index([isDeleted], name: "idx_speciality_isDeleted")
+  @@map("specialities")
+}
+
+model DoctorSpeciality {
+  id           String     @id @default(uuid())
+  doctorId     String     
+  specialityId String    
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  doctor     Doctor     @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  speciality Speciality @relation(fields: [specialityId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId], name: "idx_doctor_speciality_doctorId")
+  @@index([specialityId], name: "idx_doctor_speciality_specialityId")
+  @@map("doctor_specialities")
 }
