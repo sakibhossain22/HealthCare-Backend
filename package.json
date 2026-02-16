@@ -13,6 +13,7 @@
     "lint": "npx eslint --ext .ts src/**/*.ts",
     "dev": "tsx watch src/server.ts",
     "studio": "npx prisma studio",
+    "push": "git add . && git commit -m 'new feature added' && git push",
     "migrate": "npx prisma migrate dev && npx prisma generate"
   },
   "dependencies": {
