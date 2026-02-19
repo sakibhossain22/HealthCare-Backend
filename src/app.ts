@@ -17,7 +17,7 @@ app.use("/api/v1", indexRoutes)
 
 // Basic route
 app.get('/', async (req: Request, res: Response) => {
-    const insrt = await prisma.speciality.create({
+    const insrt = await prisma.specialty.create({
         data: {
             title: "MBBSSS",
             description: "",

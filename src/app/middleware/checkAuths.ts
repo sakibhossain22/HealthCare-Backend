@@ -42,7 +42,8 @@ export const checkAuth = (...authRole: UserRole[]) => async (req: Request, res: 
                     res.setHeader('X-Time-Remaining', timeRemaining.toString())
                     console.log("sesion expiring soon......");
                 }
-                if (user.status === UserStatus.BLOCKED || UserStatus.DELETED) {
+                console.log(user.status);
+                if (user.status === UserStatus.BLOCKED || user.status === UserStatus.DELETED) {
                     throw new AppError(status.UNAUTHORIZED, "Unauthroized Access, user is not active")
                 }
                 if (user.isDeleted) {
@@ -51,8 +52,13 @@ export const checkAuth = (...authRole: UserRole[]) => async (req: Request, res: 
                 if (authRole.length > 0 && !authRole.includes(user.role)) {
                     throw new AppError(status.FORBIDDEN, "Forbidden Access, You don't have permission to access this resource")
                 }
-
+                req.user = {
+                    userId: user.id,
+                    email: user.email,
+                    role: user.role
+                }
             }
+
         }
         const accessToken = cookieUtils.getCookie(req, "accessToken")
         if (!accessToken) {
@@ -65,6 +71,7 @@ export const checkAuth = (...authRole: UserRole[]) => async (req: Request, res: 
         if (authRole.length > 0 && !authRole.includes(verifyToken.data!.role as UserRole)) {
             throw new AppError(status.UNAUTHORIZED, "Unauthroized Access, you do not have permission to access this resource")
         }
+
         next()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
