@@ -5,6 +5,8 @@ import { auth } from "../../lib/auth"
 import { prisma } from "../../lib/prisma"
 import { tokenUtils } from "../../utils/token"
 import { IRequestUser } from "../../interfaces/requestUser.interface"
+import { jwtUtils } from "../../utils/jwt"
+import { envConfig } from "../../../config/env"
 
 interface RegisterData {
     name: string,
@@ -139,8 +141,61 @@ const getMe = async (user: IRequestUser) => {
 
     return isUserExists
 }
+const getNewToken = async (refreshToken: string, sessionToken: string) => {
+    const isSessionExists = await prisma.session.findUnique({
+        where: {
+            token: sessionToken
+        }
+    })
+    if (!isSessionExists) {
+        throw new AppError(status.UNAUTHORIZED, "Invalid Session Token");
+    }
+
+    const verifyRefreshToken = jwtUtils.verifyToken(refreshToken, envConfig.REFRESH_TOKEN_SECRET)
+
+    if (!verifyRefreshToken.success || !verifyRefreshToken.data) {
+        throw new AppError(status.UNAUTHORIZED, "Invalid Refresh Token");
+    }
+    const result = verifyRefreshToken.data
+
+    const newAccessToken = tokenUtils.getAccessToken({
+        userId: result.userId,
+        role: result.role,
+        name: result.name,
+        email: result.email,
+        status: result.status,
+        isDeleted: result.isDeleted,
+        emailVerified: result.emailVerified
+    })
+    const newRefreshToken = tokenUtils.getRefreshToken({
+        userId: result.userId,
+        role: result.role,
+        name: result.name,
+        email: result.email,
+        status: result.status,
+        isDeleted: result.isDeleted,
+        emailVerified: result.emailVerified
+    })
+    const { token } = await prisma.session.update({
+        where: {
+            token: sessionToken
+        },
+        data: {
+            token: sessionToken,
+            expiresAt: new Date(Date.now() + 60 * 60 * 60 * 24 * 1000),
+            updatedAt: new Date()
+        }
+    })
+    return {
+        newAccessToken,
+        newRefreshToken,
+        newsessionToken: token
+    }
+
+}
 export const authServices = {
     register,
     login,
-    getMe
+    getMe,
+    getNewToken
 }
