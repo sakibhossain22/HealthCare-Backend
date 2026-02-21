@@ -7,17 +7,9 @@ import { tokenUtils } from "../../utils/token"
 import { IRequestUser } from "../../interfaces/requestUser.interface"
 import { jwtUtils } from "../../utils/jwt"
 import { envConfig } from "../../../config/env"
+import { ILogin, RegisterData, IChangePasswordPayload } from "./auth.interface"
 
-interface RegisterData {
-    name: string,
-    email: string,
-    password: string
-}
 
-interface ILogin {
-    email: string,
-    password: string
-}
 const register = async (data: RegisterData) => {
     const { name, email, password } = data
     const result = await auth.api.signUpEmail({
@@ -193,8 +185,55 @@ const getNewToken = async (refreshToken: string, sessionToken: string) => {
     }
 
 }
+const changePassword = async (payload: IChangePasswordPayload, sessionToken: string) => {
+    const session = await auth.api.getSession({
+        headers: new Headers({
+            Authorization: `Bearer ${sessionToken}`
+        })
+    })
+
+    if (!session) {
+        throw new AppError(status.UNAUTHORIZED, "Invalid Session Token");
+
+    }
+    const { currentPassword, newPassword } = payload
+    const result = await auth.api.changePassword({
+        body: {
+            currentPassword,
+            newPassword,
+            revokeOtherSessions: true
+        },
+        headers: new Headers({
+            Authorization: `Bearer ${sessionToken}`
+        })
+    })
+    const accessToken = tokenUtils.getAccessToken({
+        userId: session.user.id,
+        role: session.user.role,
+        name: session.user.name,
+        email: session.user.email,
+        status: session.user.status,
+        isDeleted: session.user.isDeleted,
+        emailVerified: session.user.emailVerified
+    })
+    const refreshToken = tokenUtils.getRefreshToken({
+        userId: session.user.id,
+        role: session.user.role,
+        name: session.user.name,
+        email: session.user.email,
+        status: session.user.status,
+        isDeleted: session.user.isDeleted,
+        emailVerified: session.user.emailVerified
+    })
+    return {
+        ...result,
+        accessToken,
+        refreshToken
+    }
+}
 export const authServices = {
     register,
+    changePassword,
     login,
     getMe,
     getNewToken

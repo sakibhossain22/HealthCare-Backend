@@ -5,6 +5,7 @@ import { UserRole } from "../../../generated/prisma/enums"
 const router = Router()
 
 router.get('/me', checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), authController.getMe)
+router.post('/change-password', checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT, UserRole.SUPER_ADMIN), authController.changePassword)
 router.post('/register', authController.register)
 router.post('/login', authController.login)
 router.post('/refresh-token', authController.getNewToken)

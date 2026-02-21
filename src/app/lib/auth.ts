@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { UserRole, UserStatus } from "../../generated/prisma/enums";
 import { envConfig } from "../../config/env";
+import { bearer } from "better-auth/plugins";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -39,6 +40,9 @@ export const auth = betterAuth({
     advanced: {
         disableCSRFCheck: true,
     },
+    plugins : [
+        bearer()
+    ],
     session: {
         expiresIn: 60 * 60 * 60 * 24,
         updateAge: 60 * 60 * 60 * 24,
