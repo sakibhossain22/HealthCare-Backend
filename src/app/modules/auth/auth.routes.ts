@@ -10,5 +10,6 @@ router.post('/logout', checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIE
 router.post('/register', authController.register)
 router.post('/login', authController.login)
 router.post('/refresh-token', authController.getNewToken)
+router.post('/verify-email', authController.verifyEmail)
 
 export const authRouter = router
