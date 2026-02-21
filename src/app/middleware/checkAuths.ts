@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { UserRole, UserStatus } from "../../generated/prisma/enums";
-import { cookieUtils } from "../utils/cookie";
+import { cookieFunc } from "../utils/cookie";
 import AppError from "../ErrorHelpers/AppError";
 import status from "http-status";
 import { prisma } from "../lib/prisma";
@@ -9,7 +9,7 @@ import { envConfig } from "../../config/env";
 
 export const checkAuth = (...authRole: UserRole[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const sessionToken = cookieUtils.getCookie(req, "better-auth.session_token")
+        const sessionToken = cookieFunc.getCookie(req, "better-auth.session_token")
         if (!sessionToken) {
             throw new AppError(status.UNAUTHORIZED, "Unauthroized Access, Invalid token")
         }
@@ -59,7 +59,7 @@ export const checkAuth = (...authRole: UserRole[]) => async (req: Request, res: 
             }
 
         }
-        const accessToken = cookieUtils.getCookie(req, "accessToken")
+        const accessToken = cookieFunc.getCookie(req, "accessToken")
         if (!accessToken) {
             throw new AppError(status.UNAUTHORIZED, "Unauthroized Access, No access token was provided")
         }

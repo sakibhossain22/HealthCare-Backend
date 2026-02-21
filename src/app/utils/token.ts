@@ -2,7 +2,7 @@ import { JwtPayload, SignOptions } from "jsonwebtoken";
 import { jwtUtils } from "./jwt";
 import { envConfig } from "../../config/env";
 import { Response } from "express";
-import { cookieUtils } from "./cookie";
+import { cookieFunc} from "./cookie";
 
 const getAccessToken = (payload: JwtPayload) => {
     const accessToken = jwtUtils.createToken(payload, envConfig.ACCESS_TOKEN_SECRET, { expiresIn: envConfig.ACCESS_TOKEN_EXPIRES_IN } as SignOptions);
@@ -15,7 +15,7 @@ const getRefreshToken = (payload: JwtPayload) => {
 }
 
 const setAccessTokenCookie = (res: Response, token: string) => {
-    cookieUtils.setCookie(res, "accessToken", token, {
+    cookieFunc.setCookie(res, "accessToken", token, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
@@ -25,7 +25,7 @@ const setAccessTokenCookie = (res: Response, token: string) => {
     })
 }
 const setRefreshTokenCookie = (res: Response, token: string) => {
-    cookieUtils.setCookie(res, "refreshToken", token, {
+    cookieFunc.setCookie(res, "refreshToken", token, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
@@ -34,7 +34,7 @@ const setRefreshTokenCookie = (res: Response, token: string) => {
     })
 }
 const setBetterAuthAccessTokenCookie = (res: Response, token: string) => {
-    cookieUtils.setCookie(res, "better-auth.session_token", token, {
+    cookieFunc.setCookie(res, "better-auth.session_token", token, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
