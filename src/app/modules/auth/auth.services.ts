@@ -207,6 +207,16 @@ const changePassword = async (payload: IChangePasswordPayload, sessionToken: str
             Authorization: `Bearer ${sessionToken}`
         })
     })
+    if (session.user.needPasswordChange) {
+        await prisma.user.update({
+            where: {
+                id: session.user.id
+            },
+            data: {
+                needPasswordChange: false
+            }
+        })
+    }
     const accessToken = tokenUtils.getAccessToken({
         userId: session.user.id,
         role: session.user.role,
@@ -297,11 +307,25 @@ const resetPassword = async (email: string, otp: string, newPassword: string) =>
             password: newPassword
         }
     })
-    await prisma.session.deleteMany({
-        where: {
-            userId: isUserExists.id
-        }
-    })
+    if (isUserExists.needPasswordChange) {
+        await prisma.user.update({
+            where: {
+                id: isUserExists.id
+            },
+            data: {
+                needPasswordChange: false
+            }
+        })
+
+        await prisma.session.deleteMany({
+            where: {
+                userId: isUserExists.id
+            }
+        })
+    }
+}
+const googleLoginSuccess = async () => {
+
 }
 export const authServices = {
     register,
@@ -312,5 +336,6 @@ export const authServices = {
     getNewToken,
     verifyEmail,
     forgetPassword,
-    resetPassword
+    resetPassword,
+    googleLoginSuccess
 }

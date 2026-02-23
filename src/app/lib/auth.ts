@@ -7,6 +7,8 @@ import { bearer, emailOTP } from "better-auth/plugins";
 import { sendEmail } from "../utils/email";
 
 export const auth = betterAuth({
+    baseURL: envConfig.BETTER_AUTH_URL,
+    secret: envConfig.BETTER_AUTH_SECRET,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
@@ -45,7 +47,26 @@ export const auth = betterAuth({
     },
     trustedOrigins: [envConfig.BETTER_AUTH_URL || "http://localhost:5000"],
     advanced: {
-        disableCSRFCheck: true,
+        // disableCSRFCheck: true,
+        useSecureCookies: false,
+        cookies: {
+            state: {
+                attributes: {
+                    sameSite: "none",
+                    secure: true,
+                    httpOnly: true,
+                    path: '/'
+                }
+            },
+            sessionToken: {
+                attributes: {
+                    sameSite: "none",
+                    secure: true,
+                    httpOnly: true,
+                    path: '/'
+                }
+            }
+        }
     },
     plugins: [
         bearer(),
@@ -69,12 +90,46 @@ export const auth = betterAuth({
                             }
                         })
                     }
+                } else if (type === "forget-password") {
+                    const user = await prisma.user.findUnique({
+                        where: {
+                            email
+                        }
+                    })
+                    if (user) {
+                        sendEmail({
+                            to: email,
+                            subject: "Password Reset OTP",
+                            templateName: "otp",
+                            templateData: {
+                                name: user.name,
+                                otp
+                            }
+                        })
+                    }
                 }
             },
             expiresIn: 2 * 60,
-            otpLength: 6    
+            otpLength: 6
         })
     ],
+    socialProviders: {
+        google: {
+            clientId: envConfig.GOOGLE_CLIENT_ID,
+            clientKey: envConfig.GOOGLE_CLIENT_SECRET,
+            enabled: true,
+            mapProfileToUser: () => {
+                return {
+                    role: UserRole.PATIENT,
+                    status: UserStatus.ACTIVE,
+                    needPasswordChange: false,
+                    emailVerified: true,
+                    isDeleted: false,
+                    deletedAt: null
+                }
+            }
+        },
+    },
     session: {
         expiresIn: 60 * 60 * 60 * 24,
         updateAge: 60 * 60 * 60 * 24,

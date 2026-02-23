@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Login</title>
+</head>
+
+<body>
+    <div>
+        <p>Redirect to google ...</p>
+    </div>
+
+</body>
+<script>
+    (
+        async () => {
+            try {
+                const response = await fetch("<%=")
+            } catch (error) {
+                document.body.innerHTML = `
+                    <div>
+                        <p>Error Occured While Redirect to Google. Please Try Again Later . 
+                        ${error.message}
+                         </p>
+                     </div>
+                
+                `
+            }
+        }
+    )
+</script>
+
+</html>
