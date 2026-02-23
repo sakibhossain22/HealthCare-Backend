@@ -156,7 +156,32 @@ const getNewToken = catchAsync(
         })
     }
 )
+const forgetPassword = catchAsync(
+    async (req: Request, res: Response) => {
+        const { email } = req.body
+        await authServices.forgetPassword(email)
 
+        sendResponse(res, {
+            httpStatusCode: status.OK,
+            success: true,
+            message: "Password reset otp send to email Successfull",
+
+        })
+    }
+)
+const resetPassword = catchAsync(
+    async (req: Request, res: Response) => {
+        const { email, otp, newPassword } = req.body
+        await authServices.resetPassword(email, otp, newPassword)
+
+        sendResponse(res, {
+            httpStatusCode: status.OK,
+            success: true,
+            message: "Password Reset Successfull",
+
+        })
+    }
+)
 export const authController = {
     register,
     logoutUser,
@@ -164,5 +189,7 @@ export const authController = {
     getMe,
     getNewToken,
     changePassword,
-    verifyEmail
+    verifyEmail,
+    resetPassword,
+    forgetPassword
 }
