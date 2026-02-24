@@ -7,6 +7,8 @@ import { tokenUtils } from "../../utils/token";
 import { IRequestUser } from "../../interfaces/requestUser.interface";
 import AppError from "../../ErrorHelpers/AppError";
 import { cookieFunc } from "../../utils/cookie";
+import { envConfig } from "../../../config/env";
+import { auth } from "../../lib/auth";
 
 const register = catchAsync(
     async (req: Request, res: Response) => {
@@ -184,17 +186,54 @@ const resetPassword = catchAsync(
 )
 const googleLogin = catchAsync(
     async (req: Request, res: Response) => {
+        const redirectPath = req.query.redirect as string || "/dashboard"
+        const encodedRedirectPath = encodeURIComponent(redirectPath)
 
+        const callbackURL = `${process.env.BETTER_AUTH_URL}/api/v1/auth/google/success?redirect=${encodedRedirectPath}`
+        res.render("googleRedirect", {
+            callbackURL : callbackURL,
+            betterAuthUrl: envConfig.BETTER_AUTH_URL
+        })
     }
 )
 const googleLoginSuccess = catchAsync(
     async (req: Request, res: Response) => {
+        console.log(req.baseUrl);
+        const redirectPath = req.query.redirect as string || "/"
+        const sessionTpoken = req.cookies["better-auth.session_token"]
+        if (!sessionTpoken) {
+            return res.redirect(`${envConfig.FRONTEND_URL}/login?error=oauth_failed`)
+        }
+        const session = await auth.api.getSession({
+            headers: {
+                "Cookie": `better-auth.session_token=${sessionTpoken}`
+            }
+        })
+        if (!session) {
+            return res.redirect(`${envConfig.FRONTEND_URL}/login?error=no_session_found`)
+        }
+        if (session && !session.user) {
+            return res.redirect(`${envConfig.FRONTEND_URL}/login?error=no_user_found`)
+        }
+        const result = await authServices.googleLoginSuccess(session)
+        if (!result) {
+            return res.redirect(`${envConfig.FRONTEND_URL}/login?error=authentication_failed`)
+        }
+        const { accessToken, refreshToken } = result
+
+        tokenUtils.setAccessTokenCookie(res, accessToken)
+        tokenUtils.setRefreshTokenCookie(res, refreshToken)
+
+        const isValidRedirectPath = redirectPath.startsWith("/") && !redirectPath.startsWith("//")
+        const finalRedirectPath = isValidRedirectPath ? redirectPath : "/dashboard"
+        res.redirect(`${envConfig.FRONTEND_URL}${finalRedirectPath}`)
 
     }
 )
 const handleOauthError = catchAsync(
     async (req: Request, res: Response) => {
-
+        const error = req.query.error as string || "OAuth Authentication Failed"
+        return res.redirect(`${envConfig.FRONTEND_URL}/login?error=${error}`)
     }
 )
 export const authController = {

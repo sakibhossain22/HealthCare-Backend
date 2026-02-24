@@ -5,14 +5,27 @@ import z from "zod";
 import { TErroResponse, TErrorSources } from "../interfaces/error.interface";
 import { handleZodError } from "../ErrorHelpers/handleZodError";
 import AppError from "../ErrorHelpers/AppError";
+import { deleteFileFromCloudinary } from "../../config/cloudinary.config";
 
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-export const globalErrorHandler = (error: any, req: Request, res: Response, next: NextFunction) => {
+export const globalErrorHandler = async (error: any, req: Request, res: Response, next: NextFunction) => {
     if (envConfig.NODE_ENV === "development") {
         console.error("Error: ", error);
     }
+    if (req.file && req.file.path) {
+        // delete the file from cloudinary if there is an error
+        // we can use the deleteFileFromCloudinary function from cloudinary.config.ts
+        await deleteFileFromCloudinary(req.file.path)
+    }
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+        const fileUrl = req.files.map((file: Express.Multer.File) => file.path)
+        for (const url of fileUrl) {
+            await deleteFileFromCloudinary(url)
+        }
+    }
+
     let errorSources: TErrorSources[] = []
     let statusCode: number = status.INTERNAL_SERVER_ERROR
     let message: string = "Internal Server Error"

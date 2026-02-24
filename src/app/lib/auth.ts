@@ -45,7 +45,10 @@ export const auth = betterAuth({
             }
         },
     },
-    trustedOrigins: [envConfig.BETTER_AUTH_URL || "http://localhost:5000"],
+    trustedOrigins: [envConfig.BETTER_AUTH_URL || "http://localhost:5000", envConfig.FRONTEND_URL || "http://localhost:3000"],
+    redirectURLs: {
+        signIn: `${envConfig.BETTER_AUTH_URL}/api/v1/auth/google/success`,
+    },
     advanced: {
         // disableCSRFCheck: true,
         useSecureCookies: false,
@@ -116,7 +119,7 @@ export const auth = betterAuth({
     socialProviders: {
         google: {
             clientId: envConfig.GOOGLE_CLIENT_ID,
-            clientKey: envConfig.GOOGLE_CLIENT_SECRET,
+            clientSecret: envConfig.GOOGLE_CLIENT_SECRET,
             enabled: true,
             mapProfileToUser: () => {
                 return {

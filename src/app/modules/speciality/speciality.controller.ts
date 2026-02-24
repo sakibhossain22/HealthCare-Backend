@@ -6,7 +6,11 @@ import status from "http-status";
 
 const createSpeciality = catchAsync(
     async (req: Request, res: Response) => {
-        const payload = req.body
+        const payload = {
+            ...req.body,
+            icon: req.file?.path || ""
+        }
+
         const data = await specialityServices.createSpeciality(payload)
         sendResponse(res, {
             httpStatusCode: status.CREATED,
