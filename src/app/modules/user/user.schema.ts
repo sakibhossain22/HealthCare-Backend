@@ -9,10 +9,11 @@ export const createDoctorZodSchema = z.object({
         contactNumber: z.string("Contact number is required"),
         address: z.string("Address is required"),
         experience: z.number("Experience is required"),
+        registrationNumber: z.string("Registration number is required"),
         gender: z.enum([Gender.MALE, Gender.FEMALE], "Gender Must be either MALE or FEMALE"),
         appointmentFee: z.number("Appointment fee is required"),
         qualification: z.string("Qualification is required"),
-        currentWorkPlace: z.string("Current workplace is required"),
+        currentWorkingPlace: z.string("Current workplace is required"),
         designation: z.string("Designation is required"),
     }),
     specialities: z.array(z.uuid(), "At least one speciality is required").min(1, "At least one speciality is required")

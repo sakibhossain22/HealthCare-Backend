@@ -1,5 +1,5 @@
 import status from "http-status";
-import { Speciality, UserRole } from "../../../generated/prisma/client";
+import { Specialty, UserRole } from "../../../generated/prisma/client";
 import AppError from "../../ErrorHelpers/AppError";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
@@ -7,10 +7,10 @@ import { ICreateDoctorPayload } from "./user.interface";
 
 const createDoctor = async (payload: ICreateDoctorPayload) => {
 
-    const specialties: Speciality[] = []
+    const specialties: Specialty[] = []
 
     for (const specialityId of payload.specialities || []) {
-        const speciality = await prisma.speciality.findUnique({
+        const speciality = await prisma.specialty.findUnique({
             where: {
                 id: specialityId
             }
@@ -48,16 +48,17 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
                 data: {
                     userId: userData.user.id,
                     ...payload.doctor,
+                    currentWorkingPlace: payload.doctor.currentWorkingPlace,
 
                 }
             })
             const doctorSpecialityData = specialties.map(speciality => {
                 return {
                     doctorId: doctorData.id,
-                    specialityId: speciality.id
+                    specialtyId: speciality.id
                 }
             })
-            await tx.doctorSpeciality.createMany({
+            await tx.doctorSpecialty.createMany({
                 data: doctorSpecialityData
             })
             const doctor = await tx.doctor.findUnique({
@@ -76,7 +77,7 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
                     experience: true,
                     designation: true,
                     qualification: true,
-                    currentWorkPlace: true,
+                    currentWorkingPlace: true,
                     user: {
                         select: {
                             id: true,
@@ -90,9 +91,9 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
                             updatedAt: true
                         }
                     },
-                    specialities: {
+                    specialties: {
                         select: {
-                            speciality: {
+                            specialty: {
                                 select: {
                                     title: true,
                                     description: true,

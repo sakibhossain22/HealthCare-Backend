@@ -9,12 +9,13 @@ import status from "http-status";
 const createDoctor = catchAsync(
     async (req: Request, res: Response) => {
         const payload = req.body
+        console.log(payload);
         const data = await userService.createDoctor(payload as ICreateDoctorPayload)
         sendResponse(res, {
             httpStatusCode: status.CREATED,
             success: true,
             message: "Doctor Created Successfully",
-            data
+            data 
         })
     }
 )

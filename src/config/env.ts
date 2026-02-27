@@ -27,6 +27,8 @@ interface EnvConfig {
     CLOUDINARY_API_SECRET?: string,
     CLOUDINARY_API_KEY?: string,
     CLOUDINARY_CLOUD_NAME?: string,
+    STRIPE_WEBHOOK_SECRET: string,
+    STRIPE_SECRET_KEY: string,
 }
 
 const requiredEnvVars = [
@@ -51,7 +53,9 @@ const requiredEnvVars = [
     'FRONTEND_URL',
     'CLOUDINARY_API_SECRET',
     'CLOUDINARY_API_KEY',
-    'CLOUDINARY_CLOUD_NAME'
+    'CLOUDINARY_CLOUD_NAME',
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_SECRET_KEY"
 ]
 
 requiredEnvVars.forEach((varName) => {
@@ -81,9 +85,11 @@ const loadEnvConfig = (): EnvConfig => {
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
         FRONTEND_URL: process.env.FRONTEND_URL as string,
-        CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
-        CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
-        CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+        CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+        CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+        CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+        STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string
     }
 }
 

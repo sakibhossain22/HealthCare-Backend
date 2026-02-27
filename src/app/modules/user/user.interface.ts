@@ -13,7 +13,7 @@ export interface ICreateDoctorPayload {
         gender: Gender,
         appointmentFee: number,
         qualification: string,
-        currentWorkPlace: string,
+        currentWorkingPlace: string,
         designation: string
     },
     specialities?: string[]
