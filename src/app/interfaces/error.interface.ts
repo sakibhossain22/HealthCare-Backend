@@ -1,10 +1,10 @@
 export interface TErrorSources {
-    path?: string,
-    message?: string
+    path: string,
+    message: string
 }
 
 export interface TErroResponse {
-    statusCode: number,
+    statusCode?: number,
     success: boolean,
     message: string,
     errorSources?: TErrorSources[],

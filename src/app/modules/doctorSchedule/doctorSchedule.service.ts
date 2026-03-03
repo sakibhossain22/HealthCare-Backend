@@ -8,6 +8,7 @@ import { ICreateDoctorSchedulePayload, IUpdateDoctorSchedulePayload } from "./do
 
 
 const createMyDoctorSchedule = async (user : IRequestUser, payload : ICreateDoctorSchedulePayload) => {
+    console.log(payload);
     const doctorData = await prisma.doctor.findUniqueOrThrow({
         where:{
             email : user.email
